@@ -16,6 +16,11 @@ module.exports = function profileImageUrlUpload () {
   return (req: Request, res: Response, next: NextFunction) => {
     if (req.body.imageUrl !== undefined) {
       const url = req.body.imageUrl
+      const allowedHostnames = ['example.com', 'another-allowed-domain.com']
+      const hostname = new URL(url).hostname
+      if (!allowedHostnames.includes(hostname)) {
+        return res.status(400).send('Invalid image URL')
+      }
       if (url.match(/(.)*solve\/challenges\/server-side(.)*/) !== null) req.app.locals.abused_ssrf_bug = true
       const loggedInUser = security.authenticatedUsers.get(req.cookies.token)
       if (loggedInUser) {
